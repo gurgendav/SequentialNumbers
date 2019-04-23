@@ -6,10 +6,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SequentialNumbers.Database;
 
 namespace SequentialNumbers
 {
@@ -24,7 +28,20 @@ namespace SequentialNumbers
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        {   
+            services.AddDbContext<SqDbContext>(opts =>
+            {
+                var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+                if (string.IsNullOrEmpty(dbUrl))
+                {
+                    opts.UseInMemoryDatabase("Test");
+                }
+                else
+                {
+                    opts.UseNpgsql(dbUrl);
+                }
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

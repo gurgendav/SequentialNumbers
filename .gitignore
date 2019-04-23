@@ -3,5 +3,6 @@
 
 bin/
 obj/
+out/
 
 .sequences.csv
