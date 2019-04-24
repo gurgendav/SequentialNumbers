@@ -14,6 +14,6 @@ FROM microsoft/dotnet:aspnetcore-runtime
 WORKDIR /app
 COPY --from=build-env /app/out .
 
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT ["dotnet", "SequentialNumbers.dll"]

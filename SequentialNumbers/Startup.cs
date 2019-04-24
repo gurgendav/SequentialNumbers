@@ -31,15 +31,15 @@ namespace SequentialNumbers
         {   
             services.AddDbContext<SqDbContext>(opts =>
             {
-                var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-
+                var dbUrl = Environment.GetEnvironmentVariable("DB_CON");
+                
                 if (string.IsNullOrEmpty(dbUrl))
                 {
                     opts.UseInMemoryDatabase("Test");
                 }
                 else
                 {
-                    opts.UseNpgsql(dbUrl);
+                    opts.UseNpgsql(dbUrl); 
                 }
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -48,6 +48,16 @@ namespace SequentialNumbers
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            var dbUrl = Environment.GetEnvironmentVariable("DB_CON");
+
+            if (!string.IsNullOrEmpty(dbUrl))
+            {
+                using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    scope.ServiceProvider.GetService<SqDbContext>().Database.Migrate();
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
